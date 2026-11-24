@@ -7,10 +7,10 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v6
-      - name: generate mod files
+      - name: generate mod assets
         run: |
           python3 -m pip install --break-system-packages pillow
-          python3 generate_mod.py
+          python3 generate_assets.py
       - name: validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v6
       - name: setup jdk
