@@ -3,30 +3,45 @@ package com.immortalmod;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.phys.AABB;
 
 public final class ModEvents {
 	/** Players we gave flight to (so we only take it back from players we gave it to). */
 	private static final Set<UUID> FLYERS = new HashSet<>();
+	/** Players who have switched the Purple Hero chestplate on with the hotkey. */
+	private static final Set<UUID> HERO_ACTIVE = new HashSet<>();
 
 	private static final Set<Item> BEDROCK_BREAKERS = Set.of(ModItems.BEDROCK_PICKAXE, ModItems.IMMORTAL_PICKAXE, ModItems.GODLY_PICKAXE);
 
@@ -38,6 +53,9 @@ public final class ModEvents {
 		registerBedrockBreaking();
 		registerTotems();
 		registerArmourSets();
+		registerHero();
+		registerSwordBlocks();
+		registerOres();
 	}
 
 	// ------------------------------------------------------------ hearts persist
@@ -48,7 +66,10 @@ public final class ModEvents {
 			ModAttachments.apply(newPlayer);
 			newPlayer.setHealth(newPlayer.getMaxHealth());
 		});
-		ServerPlayerEvents.LEAVE.register(player -> FLYERS.remove(player.getUUID()));
+		ServerPlayerEvents.LEAVE.register(player -> {
+			FLYERS.remove(player.getUUID());
+			HERO_ACTIVE.remove(player.getUUID());
+		});
 	}
 
 	// ------------------------------------------------------------ bedrock pickaxe
@@ -150,11 +171,17 @@ public final class ModEvents {
 					effect(player, MobEffects.SPEED, 0);
 					effect(player, MobEffects.NIGHT_VISION, 0, 260);
 				}
-				if (wearing(player, ModItems.PURPLE_HERO_HELMET, ModItems.PURPLE_HERO_CHESTPLATE, ModItems.PURPLE_HERO_LEGGINGS, ModItems.PURPLE_HERO_BOOTS)) {
-					effect(player, MobEffects.SPEED, 2);
-					effect(player, MobEffects.JUMP_BOOST, 2);
-					effect(player, MobEffects.STRENGTH, 1);
-					effect(player, MobEffects.NIGHT_VISION, 0, 260);
+				// purple hero chestplate: only while switched on with the hotkey
+				if (HERO_ACTIVE.contains(player.getUUID())) {
+					if (player.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.PURPLE_HERO_CHESTPLATE)) {
+						effect(player, MobEffects.SPEED, 2);
+						effect(player, MobEffects.JUMP_BOOST, 2);
+						effect(player, MobEffects.STRENGTH, 1);
+						effect(player, MobEffects.RESISTANCE, 0);
+						effect(player, MobEffects.NIGHT_VISION, 0, 260);
+					} else {
+						HERO_ACTIVE.remove(player.getUUID());
+					}
 				}
 			}
 		});
@@ -191,5 +218,77 @@ public final class ModEvents {
 
 	private static void effect(ServerPlayer player, net.minecraft.core.Holder<net.minecraft.world.effect.MobEffect> effect, int amplifier, int duration) {
 		player.addEffect(new MobEffectInstance(effect, duration, amplifier, true, false));
+	}
+
+	// ------------------------------------------------------------ hero hotkey
+
+	private static void registerHero() {
+		PayloadTypeRegistry.serverboundPlay().register(HeroTogglePayload.TYPE, HeroTogglePayload.CODEC);
+		ServerPlayConnectionEvents.INIT.register((handler, server) -> ServerPlayNetworking.registerReceiver(handler, HeroTogglePayload.TYPE, ModEvents::onHeroToggle));
+	}
+
+	private static void onHeroToggle(HeroTogglePayload payload, ServerPlayNetworking.Context context) {
+		ServerPlayer player = context.player();
+		player.level().getServer().execute(() -> {
+			if (!player.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.PURPLE_HERO_CHESTPLATE)) {
+				HERO_ACTIVE.remove(player.getUUID());
+				player.sendSystemMessage(Component.literal("Wear the Purple Hero Chestplate first"), true);
+				return;
+			}
+			boolean nowOn = HERO_ACTIVE.add(player.getUUID());
+			if (!nowOn) {
+				HERO_ACTIVE.remove(player.getUUID());
+			}
+			player.sendSystemMessage(Component.literal(nowOn ? "Purple Hero: ON" : "Purple Hero: OFF"), true);
+		});
+	}
+
+	// ------------------------------------------------------------ spiky sword blocks
+
+	private static void registerSwordBlocks() {
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			if (server.getTickCount() % 4 != 0) {
+				return;
+			}
+			Set<Integer> seen = new HashSet<>();
+			for (ServerLevel level : server.getAllLevels()) {
+				for (ServerPlayer player : level.players()) {
+					for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(24.0))) {
+						if (!entity.isAlive() || !seen.add(entity.getId())) {
+							continue;
+						}
+						ModBlocks.SwordBlock touched = touchingSwordBlock(level, entity.getBoundingBox().inflate(0.06));
+						if (touched != null) {
+							entity.hurtServer(level, level.damageSources().cactus(), touched.damage);
+						}
+					}
+				}
+			}
+		});
+	}
+
+	private static ModBlocks.SwordBlock touchingSwordBlock(ServerLevel level, AABB box) {
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		for (int x = Mth.floor(box.minX); x <= Mth.floor(box.maxX); x++) {
+			for (int y = Mth.floor(box.minY); y <= Mth.floor(box.maxY); y++) {
+				for (int z = Mth.floor(box.minZ); z <= Mth.floor(box.maxZ); z++) {
+					if (level.getBlockState(pos.set(x, y, z)).getBlock() instanceof ModBlocks.SwordBlock sword) {
+						return sword;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	// ------------------------------------------------------------ ores: End outer islands only (not the main island)
+
+	private static void registerOres() {
+		for (String name : new String[] {"galaxy_ore", "immortal_ore", "godly_ore"}) {
+			BiomeModifications.addFeature(
+					BiomeSelectors.includeByKey(Biomes.END_HIGHLANDS, Biomes.END_MIDLANDS, Biomes.END_BARRENS, Biomes.SMALL_END_ISLANDS),
+					GenerationStep.Decoration.UNDERGROUND_ORES,
+					ResourceKey.create(Registries.PLACED_FEATURE, ImmortalMod.id(name)));
+		}
 	}
 }

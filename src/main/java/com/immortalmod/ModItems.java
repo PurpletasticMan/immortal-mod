@@ -78,79 +78,61 @@ public final class ModItems {
 
 	// ---- bedrock pickaxe ----
 	public static final Item BEDROCK_PICKAXE = register("bedrock_pickaxe", Item::new, unbreakable(
-			base("bedrock_pickaxe").pickaxe(ModMaterials.BEDROCK_TOOLS, 1.0F, -2.8F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.LORE, lore("Breaks bedrock in one hit", "Unbreakable"))));
+			base("bedrock_pickaxe").pickaxe(ModMaterials.BEDROCK_TOOLS, 1.0F, -2.8F).rarity(Rarity.EPIC).fireResistant()));
 
 	// ---- immortal gear ----
 	public static final Item IMMORTAL_PICKAXE = register("immortal_pickaxe", Item::new, unbreakable(
-			base("immortal_pickaxe").pickaxe(ModMaterials.IMMORTAL_TOOLS, 1.0F, -2.8F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.LORE, lore("Unbreakable", "Mines bedrock in one hit"))));
+			base("immortal_pickaxe").pickaxe(ModMaterials.IMMORTAL_TOOLS, 1.0F, -2.8F).rarity(Rarity.EPIC).fireResistant()));
 	public static final Item IMMORTAL_AXE = register("immortal_axe", Item::new, unbreakable(
-			base("immortal_axe").axe(ModMaterials.IMMORTAL_TOOLS, 5.0F, -3.0F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.LORE, lore("Unbreakable"))));
+			base("immortal_axe").axe(ModMaterials.IMMORTAL_TOOLS, 5.0F, -3.0F).rarity(Rarity.EPIC).fireResistant()));
 	public static final Item IMMORTAL_SWORD = register("immortal_sword",
 			p -> new SlashSwordItem(p, 6.0, 20.0F, 100, 1.4),
-			unbreakable(base("immortal_sword").sword(ModMaterials.IMMORTAL_TOOLS, 3.0F, -2.4F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.LORE, lore("Unbreakable", "Right-click: Immortal Slash (shockwave, 5s cooldown)"))));
+			unbreakable(base("immortal_sword").sword(ModMaterials.IMMORTAL_TOOLS, 3.0F, -2.4F).rarity(Rarity.EPIC).fireResistant()));
 	public static final Item IMMORTAL_SPEAR = register("immortal_spear",
 			p -> new LungeSpearItem(p, 24.0F, 2.2, 60),
-			unbreakable(base("immortal_spear").component(DataComponents.ATTRIBUTE_MODIFIERS, spearAttributes("immortal", 13.0, 3.0)).enchantable(30).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.LORE, lore("Unbreakable", "+3 reach", "Right-click: Piercing Lunge (3s cooldown)"))));
+			unbreakable(base("immortal_spear").component(DataComponents.ATTRIBUTE_MODIFIERS, spearAttributes("immortal", 13.0, 3.0)).enchantable(30).rarity(Rarity.EPIC).fireResistant()));
 	public static final Item IMMORTAL_HELMET = armor("immortal_helmet", ModMaterials.IMMORTAL_ARMOR, ArmorType.HELMET, Rarity.EPIC, "Wear all 4: Resistance, Strength, Fire Resistance, Night Vision");
 	public static final Item IMMORTAL_CHESTPLATE = armor("immortal_chestplate", ModMaterials.IMMORTAL_ARMOR, ArmorType.CHESTPLATE, Rarity.EPIC, "Wear all 4: Resistance, Strength, Fire Resistance, Night Vision");
 	public static final Item IMMORTAL_LEGGINGS = armor("immortal_leggings", ModMaterials.IMMORTAL_ARMOR, ArmorType.LEGGINGS, Rarity.EPIC, "Wear all 4: Resistance, Strength, Fire Resistance, Night Vision");
 	public static final Item IMMORTAL_BOOTS = armor("immortal_boots", ModMaterials.IMMORTAL_ARMOR, ArmorType.BOOTS, Rarity.EPIC, "Wear all 4: Resistance, Strength, Fire Resistance, Night Vision");
 	public static final Item IMMORTAL_ENDER_PEARL = register("immortal_ender_pearl",
 			p -> new InfinitePearlItem(p, 1.5F),
-			base("immortal_ender_pearl").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Unlimited uses, no cooldown")));
-	public static final Item IMMORTAL_TOTEM = simple("immortal_totem", p -> p.rarity(Rarity.EPIC).fireResistant().stacksTo(1)
-			.component(DataComponents.LORE, lore("Keep it anywhere in your inventory", "Saves you from death and is never used up")));
-	public static final Item HEART = register("heart", p -> new HeartItem(p, 1),
-			base("heart").rarity(Rarity.RARE).component(DataComponents.LORE, lore("Right-click: +1 permanent heart")));
-	public static final Item IMMORTAL_HEART = register("immortal_heart", p -> new HeartItem(p, 5),
-			base("immortal_heart").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Right-click: +5 permanent hearts")));
+			base("immortal_ender_pearl").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
+	public static final Item IMMORTAL_TOTEM = simple("immortal_totem", p -> p.rarity(Rarity.EPIC).fireResistant().stacksTo(1));
+	public static final Item HEART = register("heart", p -> new HeartItem(p, ModAttachments.NORMAL_HEARTS, 1),
+			base("heart").rarity(Rarity.RARE));
+	public static final Item IMMORTAL_HEART = register("immortal_heart", p -> new HeartItem(p, ModAttachments.IMMORTAL_HEARTS, 5),
+			base("immortal_heart").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
 
 	// ---- godly gear ----
 	public static final Item GODLY_PICKAXE = register("godly_pickaxe", Item::new, unbreakable(
 			base("godly_pickaxe").pickaxe(ModMaterials.GODLY_TOOLS, 1.0F, -2.8F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Unbreakable", "Near-instant mining", "Mines bedrock in one hit"))));
+					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)));
 	public static final Item GODLY_AXE = register("godly_axe", Item::new, unbreakable(
 			base("godly_axe").axe(ModMaterials.GODLY_TOOLS, 5.0F, -3.0F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Unbreakable"))));
+					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)));
 	public static final Item GODLY_SWORD = register("godly_sword",
 			p -> new SlashSwordItem(p, 12.0, 60.0F, 60, 2.2),
 			unbreakable(base("godly_sword").sword(ModMaterials.GODLY_TOOLS, 3.0F, -2.4F).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Unbreakable", "Right-click: Godly Judgement (huge shockwave, 3s cooldown)"))));
+					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)));
 	public static final Item GODLY_SPEAR = register("godly_spear",
 			p -> new LungeSpearItem(p, 70.0F, 3.0, 40),
 			unbreakable(base("godly_spear").component(DataComponents.ATTRIBUTE_MODIFIERS, spearAttributes("godly", 30.0, 5.0)).enchantable(40).rarity(Rarity.EPIC).fireResistant()
-					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Unbreakable", "+5 reach", "Right-click: Piercing Lunge (2s cooldown)"))));
+					.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)));
 	public static final Item GODLY_HELMET = armor("godly_helmet", ModMaterials.GODLY_ARMOR, ArmorType.HELMET, Rarity.EPIC, "Wear all 4: FLY, no fall damage, god-tier buffs");
 	public static final Item GODLY_CHESTPLATE = armor("godly_chestplate", ModMaterials.GODLY_ARMOR, ArmorType.CHESTPLATE, Rarity.EPIC, "Wear all 4: FLY, no fall damage, god-tier buffs");
 	public static final Item GODLY_LEGGINGS = armor("godly_leggings", ModMaterials.GODLY_ARMOR, ArmorType.LEGGINGS, Rarity.EPIC, "Wear all 4: FLY, no fall damage, god-tier buffs");
 	public static final Item GODLY_BOOTS = armor("godly_boots", ModMaterials.GODLY_ARMOR, ArmorType.BOOTS, Rarity.EPIC, "Wear all 4: FLY, no fall damage, god-tier buffs");
 	public static final Item GODLY_ENDER_PEARL = register("godly_ender_pearl",
 			p -> new InfinitePearlItem(p, 3.0F),
-			base("godly_ender_pearl").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Unlimited uses, no cooldown, throws twice as far")));
+			base("godly_ender_pearl").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
 	public static final Item GODLY_TOTEM = simple("godly_totem", p -> p.rarity(Rarity.EPIC).fireResistant().stacksTo(1)
-			.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-			.component(DataComponents.LORE, lore("Keep it anywhere in your inventory", "Full heal + god buffs on death, never used up")));
-	public static final Item GODLY_HEART = register("godly_heart", p -> new HeartItem(p, 10),
-			base("godly_heart").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
-					.component(DataComponents.LORE, lore("Right-click: +10 permanent hearts")));
+			.component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
+	public static final Item GODLY_HEART = register("godly_heart", p -> new HeartItem(p, ModAttachments.GODLY_HEARTS, 10),
+			base("godly_heart").rarity(Rarity.EPIC).fireResistant().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true));
 
 	// ---- purple superhero armour ----
-	public static final Item PURPLE_HERO_HELMET = armor("purple_hero_helmet", ModMaterials.PURPLE_HERO_ARMOR, ArmorType.HELMET, Rarity.RARE, "Wear all 4: Speed, Jump Boost, Strength");
 	public static final Item PURPLE_HERO_CHESTPLATE = armor("purple_hero_chestplate", ModMaterials.PURPLE_HERO_ARMOR, ArmorType.CHESTPLATE, Rarity.RARE, "Wear all 4: Speed, Jump Boost, Strength");
-	public static final Item PURPLE_HERO_LEGGINGS = armor("purple_hero_leggings", ModMaterials.PURPLE_HERO_ARMOR, ArmorType.LEGGINGS, Rarity.RARE, "Wear all 4: Speed, Jump Boost, Strength");
-	public static final Item PURPLE_HERO_BOOTS = armor("purple_hero_boots", ModMaterials.PURPLE_HERO_ARMOR, ArmorType.BOOTS, Rarity.RARE, "Wear all 4: Speed, Jump Boost, Strength");
 
 	// ---- enchantable sword blocks (made in the stonecutter) ----
 	public static final Item IRON_SWORD_BLOCK = swordBlock("iron_sword_block", ModBlocks.IRON_SWORD_BLOCK, net.minecraft.world.item.ToolMaterial.IRON, false);
@@ -158,6 +140,16 @@ public final class ModItems {
 	public static final Item NETHERITE_SWORD_BLOCK = swordBlock("netherite_sword_block", ModBlocks.NETHERITE_SWORD_BLOCK, net.minecraft.world.item.ToolMaterial.NETHERITE, false);
 	public static final Item IMMORTAL_SWORD_BLOCK = swordBlock("immortal_sword_block", ModBlocks.IMMORTAL_SWORD_BLOCK, ModMaterials.IMMORTAL_TOOLS, true);
 	public static final Item GODLY_SWORD_BLOCK = swordBlock("godly_sword_block", ModBlocks.GODLY_SWORD_BLOCK, ModMaterials.GODLY_TOOLS, true);
+
+	// ---- animated set blocks ----
+	public static final Item GALAXY_BLOCK = setBlock("galaxy_block", ModBlocks.GALAXY_BLOCK, Rarity.UNCOMMON);
+	public static final Item IMMORTAL_BLOCK = setBlock("immortal_block", ModBlocks.IMMORTAL_BLOCK, Rarity.EPIC);
+	public static final Item GODLY_BLOCK = setBlock("godly_block", ModBlocks.GODLY_BLOCK, Rarity.EPIC);
+
+	// ---- End ores ----
+	public static final Item GALAXY_ORE = setBlock("galaxy_ore", ModBlocks.GALAXY_ORE, Rarity.UNCOMMON);
+	public static final Item IMMORTAL_ORE = setBlock("immortal_ore", ModBlocks.IMMORTAL_ORE, Rarity.EPIC);
+	public static final Item GODLY_ORE = setBlock("godly_ore", ModBlocks.GODLY_ORE, Rarity.EPIC);
 
 	private ModItems() {
 	}
@@ -203,8 +195,7 @@ public final class ModItems {
 				p -> new GoldenFoodItem(p, List.of(
 						new MobEffectInstance(MobEffects.REGENERATION, 20 * 5, 1),
 						new MobEffectInstance(MobEffects.ABSORPTION, 20 * 60, 1))),
-				base(name).food(food).rarity(Rarity.RARE)
-						.component(DataComponents.LORE, lore("Regeneration II + Absorption II")));
+				base(name).food(food).rarity(Rarity.RARE));
 	}
 
 	private static Item apple(String name, Rarity rarity, List<MobEffectInstance> effects) {
@@ -214,8 +205,7 @@ public final class ModItems {
 	}
 
 	private static Item armor(String name, net.minecraft.world.item.equipment.ArmorMaterial material, ArmorType slot, Rarity rarity, String loreLine) {
-		Item.Properties p = base(name).humanoidArmor(material, slot).rarity(rarity)
-				.component(DataComponents.LORE, lore(loreLine));
+		Item.Properties p = base(name).humanoidArmor(material, slot).rarity(rarity);
 		if (material != ModMaterials.PURPLE_HERO_ARMOR && material != ModMaterials.GALAXY_ARMOR) {
 			p = unbreakable(p).fireResistant();
 		}
@@ -228,6 +218,13 @@ public final class ModItems {
 				.add(Attributes.ATTACK_SPEED, new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.6, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
 				.add(Attributes.ENTITY_INTERACTION_RANGE, new AttributeModifier(ImmortalMod.id(tier + "_spear_reach"), reach, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
 				.build();
+	}
+
+	private static Item setBlock(String name, Block block, Rarity rarity) {
+		Item.Properties p = base(name).useBlockDescriptionPrefix().rarity(rarity);
+		BlockItem item = Registry.register(BuiltInRegistries.ITEM, key(name), new BlockItem(block, p));
+		ALL.add(item);
+		return item;
 	}
 
 	private static Item swordBlock(String name, Block block, ToolMaterial material, boolean indestructible) {
