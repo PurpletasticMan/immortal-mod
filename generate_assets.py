@@ -366,7 +366,7 @@ for tier in SWORD_BLOCKS:
     w(f"{D}/{NS}/loot_table/blocks/{name}.json", {
         "type": "minecraft:block",
         "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{NS}:{name}"}],
-                   "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+                   "condition": {"type": "minecraft:survives_explosion"}}]})
 
 # ------------------------------------------------------------ animated set blocks (16x16 frames stacked vertically)
 import math
@@ -426,7 +426,7 @@ for setname, pal in SET_BLOCKS.items():
     w(f"{D}/{NS}/loot_table/blocks/{name}.json", {
         "type": "minecraft:block",
         "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": f"{NS}:{name}"}],
-                   "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
+                   "condition": {"type": "minecraft:survives_explosion"}}]})
 
 for tier in ("galaxy", "immortal", "godly", "purple"):
     key = "purple_hero" if tier == "purple" else tier
@@ -457,10 +457,11 @@ for _t, _st in ORE_STATS.items():
     w(f"{D}/{NS}/loot_table/blocks/{_n}.json", {
         "type": "minecraft:block",
         "pools": [{"rolls": 1, "entries": [{"type": "minecraft:alternatives", "children": [
-            {"type": "minecraft:item", "name": f"{NS}:{_n}", "conditions": [{"condition": "minecraft:match_tool", "predicate": {"predicates": {"minecraft:enchantments": [{"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]},
-            {"type": "minecraft:item", "name": f"{NS}:{_t}_ingot", "functions": [{"function": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"}, {"function": "minecraft:explosion_decay"}]}]}]}]})
-    w(f"{D}/{NS}/worldgen/configured_feature/{_n}.json", {"type": "minecraft:ore", "config": {"size": _st["size"], "discard_chance_on_air_exposure": 0.0,
-        "targets": [{"target": {"predicate_type": "minecraft:block_match", "block": "minecraft:end_stone"}, "state": {"Name": f"{NS}:{_n}"}}]}})
+            {"type": "minecraft:item", "condition": "minecraft:tool/can_silk_touch", "name": f"{NS}:{_n}"},
+            {"type": "minecraft:item", "name": f"{NS}:{_t}_ingot", "modifier": [{"type": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"}, {"type": "minecraft:explosion_decay"}]}]}]}],
+        "random_sequence": f"{NS}:blocks/{_n}"})
+    w(f"{D}/{NS}/worldgen/feature/{_n}.json", {"type": "minecraft:ore", "size": _st["size"], "discard_chance_on_air_exposure": 0.0,
+        "targets": [{"target": {"predicate_type": "minecraft:block_match", "block": "minecraft:end_stone"}, "state": f"{NS}:{_n}"}]})
     _placement = []
     if _st["rarity"]: _placement.append({"type": "minecraft:rarity_filter", "chance": _st["rarity"]})
     _placement += [{"type": "minecraft:count", "count": _st["count"]}, {"type": "minecraft:in_square"},
